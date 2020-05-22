@@ -1,0 +1,34 @@
+{
+  "name": "react-native-barcode-svg",
+  "version": "0.0.10",
+  "description": "React Native component to generate barcode. Uses @react-native-community/react-native-svg.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fanyangxi/react-native-barcode-svg.git"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "scripts": {
+    "lint": "eslint ./"
+  },
+  "keywords": [
+    "react-native",
+    "barcode",
+    "svg"
+  ],
+  "author": "YangxiFAN <fanyangxi@live.cn>",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": ">=0.59.0",
+    "react-native-svg": ">=11.0.1"
+  },
+  "dependencies": {
+    "jsbarcode": "^3.11.0",
+    "prop-types": "^15.5.10"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-plugin-react": "^7.18.3"
+  }
+}
