@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
-import Svg, { Defs, Use, Path } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import barcodes from 'jsbarcode/src/barcodes';
 
 // This encode() handles the Encoder call and builds the binary string to be rendered
