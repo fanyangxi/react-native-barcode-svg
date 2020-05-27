@@ -13,9 +13,6 @@ Uses [@react-native-community/react-native-svg](https://github.com/react-native-
 Install `react-native-barcode-svg` and dependencies:
 
     npm install react-native-barcode-svg react-native-svg
-
-or
-
     yarn add react-native-barcode-svg react-native-svg
 
 ### Step 2
