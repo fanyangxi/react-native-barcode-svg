@@ -68,3 +68,5 @@ You can find more info about the supported barcodes in the [JsBarcode README](ht
     <td>Handler for invalid barcode of selected format</td>
   </tr>
 </table>
+
+https://github.com/react-native-community/react-native-device-info

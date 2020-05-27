@@ -34,11 +34,11 @@ const encode = (text, Encoder, options) => {
   return encoded;
 };
 
-const drawRect = (x, y, width, height) => {
-  return `M${x},${y}h${width}v${height}h-${width}z`;
+const drawRect = (x, y, rectWidth, height) => {
+  return `M${x},${y}h${rectWidth}v${height}h-${rectWidth}z`;
 };
 
-const drawSvgBarCode = encoding => {
+const drawSvgBarCode = (encoding, options = {}) => {
   const rects = [];
   // binary data of barcode
   const binary = encoding.data;
@@ -48,57 +48,63 @@ const drawSvgBarCode = encoding => {
   let yFrom = 0;
 
   for (let b = 0; b < binary.length; b++) {
-    x = b;
+    x = b * options.singleBarWidth;
     if (binary[b] === '1') {
       barWidth++;
     } else if (barWidth > 0) {
-      rects[rects.length] = drawRect(x - barWidth, yFrom, barWidth, 100);
+      rects[rects.length] = drawRect(
+        x - options.singleBarWidth * barWidth,
+        yFrom,
+        options.singleBarWidth * barWidth,
+        options.height
+      );
       barWidth = 0;
     }
   }
 
   // Last draw is needed since the barcode ends with 1
   if (barWidth > 0) {
-    rects[rects.length] = drawRect(x - barWidth + 1, yFrom, barWidth, 100);
+    rects[rects.length] = drawRect(
+      x - options.singleBarWidth * (barWidth - 1),
+      yFrom,
+      options.singleBarWidth * barWidth,
+      options.height
+    );
   }
 
   return rects;
 };
 
 export default function Barcode(props) {
-  const { value, format, width, height, lineColor, backgroundColor, onError } = props;
+  const { value, format, singleBarWidth, height, lineColor, backgroundColor, onError } = props;
   const [ bars, setBars ] = useState([]);
   const [ barCodeWidth, setBarCodeWidth ] = useState(0);
 
   useEffect(() => {
-    try {
-      const encoder = barcodes[format];
-      const encoded = encode(value, encoder, props);
-  
-      if (encoded) {
-        setBars(drawSvgBarCode(encoded));
-        setBarCodeWidth(encoded.data.length * width);
-      }
-    } catch (error) {
-      if (onError && typeof onError === 'function') {
-        onError(error);
-      } else {
-        throw error;
-      }
+    // try {
+    // } catch (error) {
+    //   if (onError && typeof onError === 'function') {
+    //     onError(error);
+    //   } else {
+    //     throw error;
+    //   }
+    // }
+    const encoder = barcodes[format];
+    const encoded = encode(value, encoder, props);
+    
+    if (encoded) {
+      setBars(drawSvgBarCode(encoded, props));
+      setBarCodeWidth(encoded.data.length * singleBarWidth);
     }
-  }, [ value, format, lineColor ]);
-
-  const containerStyle = { width: barCodeWidth, height: height, backgroundColor: backgroundColor };
+  }, [ value, format, singleBarWidth, lineColor ]);
+  
+  const containerStyle = { height: height, backgroundColor: backgroundColor };
   return (
     <View style={containerStyle}>
-      <Svg
-        width="100%"
-        height="100%"
-        viewBox={`0 0 ${barCodeWidth} 100`}
-        preserveAspectRatio="xMinYMin slice"
-        fill={lineColor}
-      >
-        <Path d={bars.join(' ')} />
+      <Svg height={height} width={barCodeWidth} fill={lineColor}>
+        <G width={'100%'}>
+          <Path d={bars.join(' ')} />
+        </G>
       </Svg>
     </View>
   );
@@ -107,7 +113,7 @@ export default function Barcode(props) {
 Barcode.propTypes = {
   value: PropTypes.string,
   format: PropTypes.oneOf(Object.keys(barcodes)),
-  width: PropTypes.number,
+  singleBarWidth: PropTypes.number,
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   lineColor: PropTypes.string,
   backgroundColor: PropTypes.string,
@@ -117,7 +123,7 @@ Barcode.propTypes = {
 Barcode.defaultProps = {
   value: '',
   format: 'CODE128',
-  width: 2,
+  singleBarWidth: 2,
   height: 100,
   lineColor: '#000000',
   backgroundColor: '#FFFFFF',
