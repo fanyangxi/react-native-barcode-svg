@@ -48,8 +48,12 @@ You can find more info about the supported barcodes in the [JsBarcode README](ht
     <td>Which barcode type to use (default: CODE128).</td>
   </tr>
   <tr>
-    <td><code>width</code></td>
+    <td><code>singleBarWidth</code></td>
     <td>Width of a single bar (default: 2)</td>
+  </tr>
+  <tr>
+    <td><code>maxWidth</code></td>
+    <td>Max-width of the barcode (default: undefined, no-limitation)</td>
   </tr>
   <tr>
     <td><code>height</code></td>
