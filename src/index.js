@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Defs, Use, Path } from 'react-native-svg';
 import barcodes from 'jsbarcode/src/barcodes';
 
-// encode() handles the Encoder call and builds the binary string to be rendered
+// This encode() handles the Encoder call and builds the binary string to be rendered
 const encode = (text, Encoder, options) => {
   // If text is not a non-empty string, throw error.
   if (typeof text !== 'string' || text.length === 0) {
@@ -12,19 +12,18 @@ const encode = (text, Encoder, options) => {
   }
   
   let encoder;
-  
   try {
     encoder = new Encoder(text, options);
   } catch (error) {
     // If the encoder could not be instantiated, throw error.
     throw new Error('Invalid barcode format.');
   }
-
+  
   // If the input is not valid for the encoder, throw error.
   if (!encoder.valid()) {
     throw new Error('Invalid barcode for selected format.');
   }
-
+  
   // Make a request for the binary data (and other information) that should be rendered
   // encoded structure is {
   //  text: 'xxxxx',
@@ -42,11 +41,11 @@ const drawSvgBarCode = (encoding, options = {}) => {
   const rects = [];
   // binary data of barcode
   const binary = encoding.data;
-
+  
   let barWidth = 0;
   let x = 0;
   let yFrom = 0;
-
+  
   for (let b = 0; b < binary.length; b++) {
     x = b * options.singleBarWidth;
     if (binary[b] === '1') {
@@ -61,7 +60,7 @@ const drawSvgBarCode = (encoding, options = {}) => {
       barWidth = 0;
     }
   }
-
+  
   // Last draw is needed since the barcode ends with 1
   if (barWidth > 0) {
     rects[rects.length] = drawRect(
@@ -71,40 +70,37 @@ const drawSvgBarCode = (encoding, options = {}) => {
       options.height
     );
   }
-
+  
   return rects;
 };
 
 export default function Barcode(props) {
-  const { value, format, singleBarWidth, height, lineColor, backgroundColor, onError } = props;
+  const { value, format, singleBarWidth, maxWidth, height, lineColor, backgroundColor, onError } = props;
   const [ bars, setBars ] = useState([]);
   const [ barCodeWidth, setBarCodeWidth ] = useState(0);
-
+  const [ barCodeContainerWidth, setBarCodeContainerWidth ] = useState(0);
+  
   useEffect(() => {
-    // try {
-    // } catch (error) {
-    //   if (onError && typeof onError === 'function') {
-    //     onError(error);
-    //   } else {
-    //     throw error;
-    //   }
-    // }
     const encoder = barcodes[format];
     const encoded = encode(value, encoder, props);
     
+    const resutBarcodeWidth = encoded.data.length * singleBarWidth;
     if (encoded) {
       setBars(drawSvgBarCode(encoded, props));
-      setBarCodeWidth(encoded.data.length * singleBarWidth);
+      setBarCodeWidth(resutBarcodeWidth);
+      setBarCodeContainerWidth((maxWidth && resutBarcodeWidth > maxWidth) ? maxWidth : resutBarcodeWidth);
     }
-  }, [ value, format, singleBarWidth, lineColor ]);
+  }, [ value, format, singleBarWidth, maxWidth, lineColor ]);
   
-  const containerStyle = { height: height, backgroundColor: backgroundColor };
+  const containerStyle = { width: barCodeContainerWidth, height: height, backgroundColor: backgroundColor };
   return (
     <View style={containerStyle}>
-      <Svg height={height} width={barCodeWidth} fill={lineColor}>
-        <G width={'100%'}>
-          <Path d={bars.join(' ')} />
-        </G>
+      <Svg
+        width={'100%'} height={'100%'} fill={lineColor}
+        viewBox={`0 0 ${barCodeWidth} ${height}`}
+        preserveAspectRatio="none"
+      >
+        <Path d={bars.join(' ')} />
       </Svg>
     </View>
   );
@@ -114,6 +110,7 @@ Barcode.propTypes = {
   value: PropTypes.string,
   format: PropTypes.oneOf(Object.keys(barcodes)),
   singleBarWidth: PropTypes.number,
+  maxWidth: PropTypes.number,
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   lineColor: PropTypes.string,
   backgroundColor: PropTypes.string,
@@ -124,6 +121,7 @@ Barcode.defaultProps = {
   value: '',
   format: 'CODE128',
   singleBarWidth: 2,
+  maxWidth: undefined,
   height: 100,
   lineColor: '#000000',
   backgroundColor: '#FFFFFF',

@@ -8,7 +8,9 @@ export interface BarcodeProps {
   // barcode-format: https://github.com/lindell/JsBarcode/blob/master/src/barcodes/index.js
   format?: string;
   // The width of a single-bar
-  width?: number;
+  singleBarWidth?: number;
+  // The max-width of the barcode
+  maxWidth?: number;
   // The height of the barcode
   height?: number;
   // The color of the bars
