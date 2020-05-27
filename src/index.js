@@ -90,7 +90,7 @@ export default function Barcode(props) {
       setBarCodeWidth(resutBarcodeWidth);
       setBarCodeContainerWidth((maxWidth && resutBarcodeWidth > maxWidth) ? maxWidth : resutBarcodeWidth);
     }
-  }, [ value, format, singleBarWidth, maxWidth, lineColor ]);
+  }, [ value, format, singleBarWidth, maxWidth, height, lineColor ]);
   
   const containerStyle = { width: barCodeContainerWidth, height: height, backgroundColor: backgroundColor };
   return (

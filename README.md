@@ -45,7 +45,7 @@ You can find more info about the supported barcodes in the [JsBarcode README](ht
   </tr>
   <tr>
     <td><code>format</code></td>
-    <td>Which barcode type to use (default: CODE128).</td>
+    <td>Which barcode type to use (default: CODE128). https://github.com/lindell/JsBarcode/blob/master/src/barcodes/index.js</td>
   </tr>
   <tr>
     <td><code>singleBarWidth</code></td>
@@ -57,7 +57,7 @@ You can find more info about the supported barcodes in the [JsBarcode README](ht
   </tr>
   <tr>
     <td><code>height</code></td>
-    <td>Height of the barcode (default: 100, also can be '100%')</td>
+    <td>Height of the barcode (default: 100)</td>
   </tr>
   <tr>
     <td><code>lineColor</code></td>
@@ -72,5 +72,3 @@ You can find more info about the supported barcodes in the [JsBarcode README](ht
     <td>Handler for invalid barcode of selected format</td>
   </tr>
 </table>
-
-https://github.com/react-native-community/react-native-device-info
