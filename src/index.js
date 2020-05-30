@@ -43,8 +43,6 @@ const encode = (text, Encoder, options) => {
     linearEncodings[i].options = merge(options, linearEncodings[i].options);
   }
 
-  // eslint-disable-next-line no-console
-  console.log(linearEncodings);
   return linearEncodings;
 };
 
