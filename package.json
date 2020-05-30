@@ -1,6 +1,6 @@
 {
   "name": "react-native-barcode-svg",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "React Native component to generate barcode. Uses @react-native-community/react-native-svg.",
   "repository": {
     "type": "git",
