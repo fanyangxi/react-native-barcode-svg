@@ -27,7 +27,7 @@ import Barcode from 'react-native-barcode-svg';
 
 ### Supported formats:
 
-You can find more info about the supported barcodes in the:  
+You can find more info about the supported barcode formats (EG.: CODE128, EAN13, EAN8, UPC, ITF, ...) in the:  
 [JsBarcode README](https://github.com/lindell/JsBarcode#supported-barcodes)  
 [JsBarcode Barcode Generator](https://lindell.me/JsBarcode/generator/)
 
