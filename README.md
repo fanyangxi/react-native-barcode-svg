@@ -1,6 +1,6 @@
 # react-native-barcode-svg
 
-React Native component to generate barcodes.
+React Native component to generate barcode, without display text/value.
 
 Uses [JsBarcode](https://github.com/lindell/JsBarcode) for encoding of data.
 
