@@ -1,14 +1,9 @@
 import PropTypes from 'prop-types';
-// eslint-disable-next-line import/no-unresolved
-import React, { useState, useEffect } from 'react';
-// eslint-disable-next-line import/no-unresolved
-import { View, Text } from 'react-native';
-// eslint-disable-next-line import/no-unresolved
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import barcodes from 'jsbarcode/src/barcodes';
-import {
-  getBarcodePadding, getEncodingHeight, linearizeEncodings, merge,
-} from './shared';
+import { linearizeEncodings, merge } from './shared';
 
 // This encode() handles the Encoder call and builds the binary string to be rendered
 const encode = (text, Encoder, options) => {
@@ -32,8 +27,9 @@ const encode = (text, Encoder, options) => {
 
   // Make a request for the binary data (and other information) that should be rendered
   // encoded structure is {
-  //  text: 'xxxxx',
-  //  data: '110100100001....'
+  //  text: 'sample-text',
+  //  data: '110100100001....',
+  //  options: {...}
   // }
   const encoded = encoder.encode();
 
@@ -43,6 +39,7 @@ const encode = (text, Encoder, options) => {
 
   // Merge
   for (let i = 0; i < linearEncodings.length; i++) {
+    // linearEncodings[i].key = `bar-group-encoding-${i}`;
     linearEncodings[i].options = merge(options, linearEncodings[i].options);
   }
 
@@ -51,31 +48,10 @@ const encode = (text, Encoder, options) => {
   return linearEncodings;
 };
 
-const getBarEncodings = (encodings) => {
-  for (let i = 0; i < linearEncodings.length; i++) {
-    const barEncoding = linearEncodings[i];
-
-    // // Calculate the width of the encoding
-    // let textWidth;
-    // if (options.displayValue) {
-    //   textWidth = messureText(encoding.text, options, context);
-    // } else {
-    //   textWidth = 0;
-    // }
-    const barcodeWidth = barEncoding.data.length * barEncoding.options.singleBarWidth;
-    // barEncoding.width = Math.ceil(barcodeWidth);// Math.ceil(Math.max(textWidth, barcodeWidth));
-    // barEncoding.height = getEncodingHeight(barEncoding, options);
-    barEncoding.offsetX = getBarcodePadding(barcodeWidth, options);
-    // barEncoding.barcodePadding = getBarcodePadding(barcodeWidth, options);
-  }
-};
-
 const getTotalWidthOfEncodings = (encodings) => Array.from(encodings)
-  .map((encoding, index) => encoding.data.length)
-  .reduce((sum, x) => sum + x) // sum(item.length)
-;
+  .map((encoding) => encoding.data.length)
+  .reduce((sum, x) => sum + x); // sum(item.length)
 
-// ===========
 const drawRect = (x, y, rectWidth, height) => `M${x},${y}h${rectWidth}v${height}h-${rectWidth}z`;
 
 const drawSvgBar = (encoding, paddingLeft = 0, options = {}) => {
@@ -120,58 +96,31 @@ const drawSvgBars = (encodings, options = {}) => {
   const results = [];
   let barPaddingLeft = 0;
 
-  Array.from(encodings).forEach((encoding, index) => {
+  Array.from(encodings).forEach((encoding) => {
     const bar = drawSvgBar(encoding, barPaddingLeft, options);
     results.push(bar);
     barPaddingLeft += encoding.data.length * 2;
-
-    console.log(`>> each:${index} -> ${encoding.data.length}`);
   });
   return results.flat();
 };
 
 export default function Barcode(props) {
   const {
-    value,
-    format,
-    singleBarWidth,
-    maxWidth,
-    height,
-    lineColor,
-    backgroundColor,
-    onError,
-    displayValue,
-    textAlign,
-    textPosition,
-    textMargin,
-    fontSize,
+    value, format, singleBarWidth, maxWidth, height, lineColor, backgroundColor, onError,
   } = props;
   const [bars, setBars] = useState([]);
   const [barcodeWidth, setBarCodeWidth] = useState(0);
   const [barcodeContainerWidth, setBarcodeContainerWidth] = useState(0);
   const [barcodeError, setBarcodeError] = useState('');
 
-  const jsBarcodeEncoderOptions = {
-    width: singleBarWidth,
-    height,
-    format,
-    displayValue,
-    fontOptions: undefined,
-    font: undefined,
-    text: undefined,
-    textAlign,
-    textPosition,
-    textMargin,
-    fontSize,
-    background: backgroundColor,
-    lineColor,
-    margin: undefined,
-    marginTop: undefined,
-    marginBottom: undefined,
-    marginLeft: undefined,
-    marginRight: undefined,
-    valid: () => {},
-  };
+  // const jsBarcodeEncoderOptions = {
+  //   width: singleBarWidth,
+  //   height,
+  //   format,
+  //   text: undefined,
+  //   background: backgroundColor,
+  //   lineColor,
+  // };
 
   useEffect(() => {
     try {
@@ -180,26 +129,25 @@ export default function Barcode(props) {
 
       const barcodeTotalWidth = getTotalWidthOfEncodings(linearEncodings) * singleBarWidth;
       const theBars = drawSvgBars(linearEncodings, props);
-      console.log(theBars);
-      console.log(`>> barcodeTotalWidth:${barcodeTotalWidth}`);
 
       if (linearEncodings.length > 0) {
         setBars(theBars);
         setBarCodeWidth(barcodeTotalWidth);
         setBarcodeContainerWidth((maxWidth && barcodeTotalWidth > maxWidth) ? maxWidth : barcodeTotalWidth);
       }
+      setBarcodeError('');
     } catch (e) {
       setBarcodeError(e.message);
-      setBarcodeContainerWidth(300);
+      setBarcodeContainerWidth(200);
+      onError && onError(e);
     }
   }, [value, format, singleBarWidth, maxWidth, height, lineColor]);
 
-  const containerStyle = { width: barcodeContainerWidth, height, backgroundColor: 'lightgreen' };
+  const containerStyle = { width: barcodeContainerWidth, height, backgroundColor };
   return (
-    // eslint-disable-next-line react/jsx-filename-extension
     <View style={containerStyle}>
       {barcodeError
-        ? <Text>{`${barcodeError}`}</Text>
+        ? <View style={styles.errorMessage}><Text>{`${barcodeError}`}</Text></View>
         : (
           <Svg
             width="100%"
@@ -217,37 +165,31 @@ export default function Barcode(props) {
 
 Barcode.propTypes = {
   value: PropTypes.string,
-  // Options:
   format: PropTypes.oneOf(Object.keys(barcodes)),
   singleBarWidth: PropTypes.number, // width
   maxWidth: PropTypes.number,
   height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  displayValue: PropTypes.bool,
-  // text	undefined	String
-  // fontOptions
-  // font
-  textAlign: PropTypes.string,
-  textPosition: PropTypes.string,
-  textMargin: PropTypes.number,
-  fontSize: PropTypes.number,
-  backgroundColor: PropTypes.string, // background
   lineColor: PropTypes.string,
+  backgroundColor: PropTypes.string, // background
   onError: PropTypes.func,
 };
 
 Barcode.defaultProps = {
   value: '',
-  // Options:
   format: 'CODE128',
   singleBarWidth: 2, // width
   maxWidth: undefined,
   height: 100,
-  displayValue: true,
-  textAlign: 'center',
-  textPosition: 'bottom',
-  textMargin: 2,
-  fontSize: 20,
-  backgroundColor: '#FFFFFF',
   lineColor: '#000000',
+  backgroundColor: '#FFFFFF',
   onError: undefined,
 };
+
+const styles = StyleSheet.create({
+  errorMessage: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+  },
+});

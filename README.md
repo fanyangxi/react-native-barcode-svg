@@ -25,7 +25,11 @@ import Barcode from 'react-native-barcode-svg';
 <Barcode value="Hello World" format="CODE128" />;
 ```
 
-You can find more info about the supported barcodes in the [JsBarcode README](https://github.com/lindell/JsBarcode#supported-barcodes).
+### Supported formats:
+
+You can find more info about the supported barcodes in the:  
+[JsBarcode README](https://github.com/lindell/JsBarcode#supported-barcodes)  
+[JsBarcode Barcode Generator](https://lindell.me/JsBarcode/generator/)
 
 ![](./images/example.png)
 

@@ -7,6 +7,10 @@
   },
   "rules": {
     "strict": [0, "global"],
+    "no-plusplus": "off",
+    "no-use-before-define": "off",
+    "react/jsx-filename-extension": "off",
+    "no-unused-expressions": "off",
     "max-len": ["error", { "code": 120 }]
   }
 }
