@@ -103,9 +103,23 @@ const drawSvgBars = (encodings, options = {}) => {
 };
 
 export default function Barcode(props) {
+  const defaults = {
+    value: '',
+    format: 'CODE128',
+    singleBarWidth: 2, // width
+    maxWidth: undefined,
+    height: 100,
+    lineColor: '#000000',
+    backgroundColor: '#FFFFFF',
+    onError: undefined,
+  };
+
+  const mergedProps = merge(defaults, props);
+
   const {
     value, format, singleBarWidth, maxWidth, height, lineColor, backgroundColor, onError,
-  } = props;
+  } = mergedProps;
+
   const [bars, setBars] = useState([]);
   const [barcodeWidth, setBarCodeWidth] = useState(0);
   const [barcodeContainerWidth, setBarcodeContainerWidth] = useState(0);
@@ -123,10 +137,10 @@ export default function Barcode(props) {
   useEffect(() => {
     try {
       const encoder = barcodes[format];
-      const linearEncodings = encode(value, encoder, props);
+      const linearEncodings = encode(value, encoder, mergedProps);
 
       const barcodeTotalWidth = getTotalWidthOfEncodings(linearEncodings) * singleBarWidth;
-      const theBars = drawSvgBars(linearEncodings, props);
+      const theBars = drawSvgBars(linearEncodings, mergedProps);
 
       if (linearEncodings.length > 0) {
         setBars(theBars);
@@ -170,17 +184,6 @@ Barcode.propTypes = {
   lineColor: PropTypes.string,
   backgroundColor: PropTypes.string, // background
   onError: PropTypes.func,
-};
-
-Barcode.defaultProps = {
-  value: '',
-  format: 'CODE128',
-  singleBarWidth: 2, // width
-  maxWidth: undefined,
-  height: 100,
-  lineColor: '#000000',
-  backgroundColor: '#FFFFFF',
-  onError: undefined,
 };
 
 const styles = StyleSheet.create({
